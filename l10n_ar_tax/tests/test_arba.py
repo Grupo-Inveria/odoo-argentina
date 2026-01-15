@@ -1,4 +1,3 @@
-from odoo import fields
 from odoo.exceptions import UserError
 from odoo.tests import common
 
@@ -17,15 +16,7 @@ class TestARBA(common.TransactionCase):
         )
         company = company.with_company(company)
         with self.assertRaisesRegex(UserError, "You must configure CIT"):
-            company.arba_consultar_contribuyente(
-                "30697130841",
-                fields.Date.start_of(fields.Date.today(), "month").strftime("%Y%m%d"),
-                fields.Date.end_of(fields.Date.today(), "month").strftime("%Y%m%d"),
-            )
+            company.arba_connect()
         company.vat = ""
         with self.assertRaisesRegex(UserError, "No VAT configured"):
-            company.arba_consultar_contribuyente(
-                "30697130841",
-                fields.Date.start_of(fields.Date.today(), "month").strftime("%Y%m%d"),
-                fields.Date.end_of(fields.Date.today(), "month").strftime("%Y%m%d"),
-            )
+            company.arba_connect()
