@@ -16,10 +16,13 @@ class ResConfigSettings(models.TransientModel):
 
     def l10n_ar_arba_cit_test(self):
         self.ensure_one()
-        cuit = self.company_id.partner_id.ensure_vat()
+        partner = self.company_id.partner_id
+        if not partner.vat:
+            raise UserError(_("El partner no tiene configurado un CUIT/CUIL"))
+        cuit = partner.vat
         _logger.info("Getting ARBA data for cuit %s" % (cuit))
         try:
-            self.fiscal_position_id.company_id.arba_consultar_contribuyente(
+            self.company_id.arba_consultar_contribuyente(
                 cuit,
                 fields.Date.start_of(fields.Date.today(), "month").strftime("%Y%m%d"),
                 fields.Date.end_of(fields.Date.today(), "month").strftime("%Y%m%d"),

@@ -165,7 +165,9 @@ class AccountFiscalPositionL10nArTax(models.Model):
         """
         self.ensure_one()
 
-        cuit = partner.ensure_vat()
+        if not partner.vat:
+            raise UserError(_("El partner no tiene configurado un CUIT/CUIL"))
+        cuit = partner.vat
         _logger.info("Getting ARBA data for cuit %s from date %s to date %s" % (date, to_date, cuit))
 
         padron_file = self.env["res.company.jurisdiction.padron"].search(

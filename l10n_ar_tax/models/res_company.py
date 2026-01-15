@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 from hashlib import md5
 
 import requests
-from odoo import _, api, models
+from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
@@ -13,6 +13,11 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 class ResCompany(models.Model):
     _inherit = "res.company"
+
+    arba_cit = fields.Char(
+        string="ARBA CIT Password",
+        help="Clave CIT para conectarse al webservice de ARBA para consulta de alícuotas de retención y percepción de IIBB",
+    )
 
     @api.model
     def _get_arba_environment_type(self):
@@ -78,7 +83,8 @@ class ResCompany(models.Model):
 
     def arba_consultar_contribuyente(self, vat, date_from, date_to):
         self.ensure_one()
-        self.partner_id.ensure_vat()
+        if not self.partner_id.vat:
+            raise UserError(_("El partner no tiene configurado un CUIT/CUIL"))
         if not self.arba_cit:
             raise UserError(_("You must configure CIT password on company %s") % (self.name))
         environment_type = self._get_arba_environment_type()
@@ -88,7 +94,7 @@ class ResCompany(models.Model):
             self.env["ir.config_parameter"].sudo().get_param("l10n_ar_tax.arba_alicout_timeout", default=40)
         )
         request_data = {
-            "user": self.partner_id.ensure_vat(),
+            "user": self.partner_id.vat,
             "password": self.arba_cit,
         }
         res = requests.post(login_url, data=request_data, files={"file": file}, timeout=arba_alicout_timeout)
