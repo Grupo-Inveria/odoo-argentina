@@ -19,8 +19,8 @@
 ##############################################################################
 {
     "name": "Automatic Argentinian Withholdings on Payments",
-    "version": "19.0.1.2.0",
-    "author": "ADHOC SA,Odoo Community Association (OCA)",
+    "version": "19.0.1.3.0",
+    "author": "ADHOC SA,Inveria,Odoo Community Association (OCA)",
     "website": "www.adhoc.com.ar",
     "license": "AGPL-3",
     "category": "Accounting & Finance",
